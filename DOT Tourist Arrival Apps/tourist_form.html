@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tourist Information Form</title>
+
+<style>
+    /* --- RESET & BODY --- */
+    * { box-sizing: border-box; margin:0; padding:0; font-family: "Segoe UI", Arial, sans-serif; }
+    body { background: #eef3fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+    /* --- FORM WRAPPER --- */
+    .wrapper { width: 100%; max-width: 900px; padding: 15px; }
+    .form-card { background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.1); animation: fadeIn 0.6s ease-in-out; }
+    @keyframes fadeIn { from {opacity:0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+
+    h2 { text-align:center; color: #DAA520; /* Gold */ font-size:26px; font-weight:700; margin-bottom:30px; }
+
+    /* --- FORM FIELDS --- */
+    .form-group { margin-bottom: 18px; }
+    label { font-size: 15px; font-weight: 600; color:#333; margin-bottom:6px; display:block; }
+    input, select { width: 100%; padding: 12px; font-size: 14px; border: 1px solid #ccd2e0; border-radius: 12px; outline:none; background:#f9fbff; transition: all 0.3s; }
+    input:focus, select:focus { border-color: #DAA520; box-shadow: 0 0 8px rgba(218,165,32,0.3); background: #fff; } /* Gold color for focus */
+
+    /* --- FLEX ROWS --- */
+    .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
+    .form-row .form-group { flex: 1; min-width: 150px; }
+
+    /* --- SPECIAL ADDRESS GROUP --- */
+    .address-group { display:flex; flex-direction: column; gap:8px; }
+
+    /* --- SUBMIT BUTTON --- */
+    button { width:100%; padding:14px; background:#DAA520; border:none; color:white; font-size:17px; border-radius:12px; cursor:pointer; margin-top:10px; transition: 0.3s; }
+    button:hover { background:#C4A11D; transform: translateY(-2px); }
+
+    /* --- SUCCESS MESSAGE --- */
+    #result { margin-top:20px; padding:15px; display:none; background:#e8ffe8; border-left:6px solid #28a745; border-radius:10px; color:#256f33; font-size:15px; font-weight:600; }
+
+    /* --- OTHERS INPUT --- */
+    #othersInput { display:none; margin-top:8px; }
+
+    /* --- RESPONSIVE --- */
+    @media(max-width:720px){
+        .form-row { flex-direction: column; }
+        .form-row .form-group { min-width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="form-card">
+        <h2>Tourist Information Form</h2>
+
+        <form id="touristForm">
+
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" required placeholder="Full Name" />
+            </div>
+
+            <div class="form-group address-group">
+                <label>Address</label>
+                <input type="text" placeholder="Barangay" required />
+                <input type="text" placeholder="City / Municipality" required />
+                <input type="text" placeholder="Province" required />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" min="0" required />
+                </div>
+                <div class="form-group">
+                    <label>Contact #</label>
+                    <input type="text" placeholder="09XXXXXXXXX" required />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select required>
+                        <option disabled selected>Select gender</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Employment Status</label>
+                    <select required>
+                        <option disabled selected>Select status</option>
+                        <option>Private</option>
+                        <option>Government</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nationality</label>
+                    <input type="text" placeholder="e.g. Filipino / Foreign" required />
+                </div>
+                <div class="form-group">
+                    <label>Purpose of Visit</label>
+                    <input type="text" placeholder="e.g. Sightseeing, Business" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Sites to Visit</label>
+                <select id="sites" onchange="showOthersInput()"> 
+                    <option disabled selected>Select site</option>
+                    <option>Barasoain Church</option>
+                    <option>Barasoain Museum</option>
+                    <option>Cathedral Church</option>
+                    <option>Club Royale</option>
+                    <option>Kapitolyo</option>
+                    <option>Others</option>
+                </select>
+                <input type="text" id="othersInput" placeholder="Please specify..." />
+            </div>
+
+            <div class="form-group">
+                <label>Overnight Stay in Malolos</label>
+                <select required>
+                    <option disabled selected>Select</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="submitForm()">Submit</button>
+        </form>
+
+        <div id="result">✔ Form submitted successfully! Redirecting to Dashboard...</div>
+    </div>
+</div>
+
+<script>
+    // I-aalis natin ang lumang loginForm script dito dahil ito ay para sa login page
+
+    // --- FUNCTION PARA SA "SITES TO VISIT" (para sa 'Others' field) ---
+    function showOthersInput() {
+        const sites = document.getElementById('sites');
+        const othersInput = document.getElementById('othersInput');
+        
+        // Ipakita ang "Others" input box kung ang pinili ay "Others"
+        if (sites.value === 'Others') {
+            othersInput.style.display = 'block';
+            othersInput.setAttribute('required', 'required');
+        } else {
+            othersInput.style.display = 'none';
+            othersInput.removeAttribute('required');
+            othersInput.value = '';
+        }
+    }
+
+    // --- FUNCTION PARA SA SUBMIT BUTTON (para sa Dashboard redirect) ---
+    function submitForm() {
+        const form = document.getElementById('touristForm');
+        const resultDiv = document.getElementById('result');
+
+        // Check kung valid ang lahat ng required fields
+        if (form.checkValidity()) {
+            
+            // NOTE: Kung may server-side submission logic dito, ilagay bago ang redirect.
+            
+            // Ipakita ang success message
+            resultDiv.style.display = 'block';
+            
+            // I-redirect sa Dashboard pagkatapos ng 1.5 seconds
+            setTimeout(() => {
+                // ** ITO ANG NAG-II-LINK SA DASHBOARD PAGE! **
+                window.location.href = 'dashboard.html'; 
+            }, 1500); 
+            
+        } else {
+            // Kung may required field na hindi napunan, magpakita ng alert at native validation errors
+            alert('Please fill out all required fields before submitting.');
+            form.reportValidity();
+        }
+    }
+</script>
+
+</body>
+</html>

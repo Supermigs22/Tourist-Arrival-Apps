@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Generator - Tourist Arrival</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            background: #f4f7fb;
+        }
+
+        #qrcode {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            display: inline-block;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #007bff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #005fcc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Tourist Arrival - QR Code Generator</h2>
+    <p>Lagyan ng HTML code, URL, o kahit text na gusto mong i-encode:</p>
+
+    <textarea id="text" rows="5" placeholder="Ilalagay mo dito yung HTML form link mo o HTML code..."></textarea><br>
+
+    <button onclick="generateQR()">Generate QR Code</button>
+
+    <div id="qrcode"></div>
+
+    <!-- QRCodeJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <script>
+        function generateQR() {
+            var text = document.getElementById("text").value;
+
+            // Clear previous QR
+            document.getElementById("qrcode").innerHTML = "";
+
+            // Generate new QR
+            new QRCode(document.getElementById("qrcode"), {
+                text: text,
+                width: 250,
+                height: 250
+            });
+        }
+    </script>
+
+</body>
+</html>

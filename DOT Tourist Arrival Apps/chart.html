@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Establishment Data Charts (Dynamic Years) - Updated</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 1000px; 
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px; 
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+        #dataInputDynamic {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        #dataInputDynamic label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        #dataInputDynamic input[type="text"],
+        #dataInputDynamic input[type="number"],
+        #dataInputDynamic input[type="submit"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box; 
+            margin-bottom: 10px;
+        }
+        
+        .month-input-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #dataInputDynamic button {
+            padding: 12px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+        #dataInputDynamic button:hover {
+            background-color: #0056b3;
+        }
+        
+        .chartjs-render-monitor, canvas {
+            font-size: 10px; 
+        }
+        
+        #dynamicChartsContainer {
+            margin-top: 30px;
+        }
+        /* Style for the Back Button */
+        .back-button {
+            display: inline-block; 
+            padding: 10px 20px; 
+            background-color: #555; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin: 10px 0 20px 0;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="dashboard.html" class="back-button">
+        ⬅️ Back to Dashboard
+    </a>
+    
+    <h1>📊 Monthly Establishment Data Visualizations (Dynamic Years)</h1>
+
+    <div class="chart-container">
+        <h2>Establishment Data - Dynamic Input (2025 onwards)</h2>
+        <div id="dataInputDynamic">
+            <h3>Add New/Update Establishment Data</h3>
+
+            <div>
+                <label for="estName">Establishment Name:</label>
+                <input type="text" id="estName" placeholder="E.g., NEW RESORT HOTEL">
+            </div>
+
+            <div>
+                <label for="inputYear">Year (2025, 2026, etc.):</label>
+                <input type="number" id="inputYear" placeholder="E.g., 2026" min="2025" value="2025">
+            </div>
+
+            <div class="month-input-grid">
+                <input type="number" name="month_input" id="janInput" placeholder="Jan" value="0" min="0">
+                <input type="number" name="month_input" id="febInput" placeholder="Feb" value="0" min="0">
+                <input type="number" name="month_input" id="marInput" placeholder="Mar" value="0" min="0">
+                <input type="number" name="month_input" id="aprInput" placeholder="Apr" value="0" min="0">
+                <input type="number" name="month_input" id="mayInput" placeholder="May" value="0" min="0">
+                <input type="number" name="month_input" id="junInput" placeholder="Jun" value="0" min="0">
+                <input type="number" name="month_input" id="julInput" placeholder="Jul" value="0" min="0">
+                <input type="number" name="month_input" id="augInput" placeholder="Aug" value="0" min="0">
+                <input type="number" name="month_input" id="sepInput" placeholder="Sep" value="0" min="0">
+                <input type="number" name="month_input" id="octInput" placeholder="Oct" value="0" min="0">
+                <input type="number" name="month_input" id="novInput" placeholder="Nov" value="0" min="0">
+                <input type="number" name="month_input" id="decInput" placeholder="Dec" value="0" min="0">
+            </div>
+            <button onclick="addDynamicData()" style="background-color:#007bff;">Save Data</button>
+
+            <button onclick="cancelInput()" 
+            style="background-color:#dc3545; margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Establishment Data - 2023</h2>
+        <canvas id="chart2023"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>Establishment Data - 2024</h2>
+        <canvas id="chart2024"></canvas>
+    </div>
+
+    <div id="dynamicChartsContainer">
+    </div>
+
+
+    <script>
+        // --- 1. RAW DATA & CONFIGURATION ---
+        
+        const establishmentLabels = [
+            'MUSEO NG REPUBLIKA NG 1899', 'MUSEO NG KASAYSAYANG', 'PAMPULITTIKA NG PILIPINAS', 
+            'MALOLOS HISTORIC TOWN CENTER', 'VILLA JUANITA RESORT', 'DJ PARADISE RESORT', 
+            'DJ PARADISE HOTEL', 'BARCIE INTL CENTER', 'JADE & TROI RESORT', 
+            'TAMPISAW KILA KUYA RUBEN', 'W & D DREAMLAND', 'THE MANGO TREE', 
+            'PALM GARDEN RESORT', 'MALOLOS RESORT CLUB ROYALE', 'FLORES PRIVATE RESORT'
+        ];
+
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'decm'];
+        
+        // Data for 2023 (Static)
+        const data2023 = [
+            { name: 'MUSEO NG REPUBLIKA NG 1899', data: [2940, 1856, 7075, 6684, 4789, 3573, 2547, 2472, 1969, 7367, 21389, 7718] },
+            { name: 'MUSEO NG KASAYSAYANG', data: [1068, 2192, 1579, 3003, 1710, 1395, 751, 638, 1047, 2205, 5056, 2105] },
+            { name: 'PAMPULITTIKA NG PILIPINAS', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { name: 'MALOLOS HISTORIC TOWN CENTER', data: [0, 0, 0, 1525, 92, 65, 47, 0, 0, 0, 0, 0] },
+            { name: 'VILLA JUANITA RESORT', data: [0, 0, 0, 1700, 2200, 2600, 1450, 1350, 1150, 1150, 1240, 1240] },
+            { name: 'DJ PARADISE RESORT', data: [0, 0, 0, 193, 314, 1131, 581, 358, 229, 218, 376, 496] },
+            { name: 'DJ PARADISE HOTEL', data: [152, 193, 314, 0, 0, 0, 0, 0, 0, 125, 89, 176] },
+            { name: 'BARCIE INTL CENTER', data: [189, 165, 277, 0, 450, 400, 420, 360, 360, 390, 430, 448] },
+            { name: 'JADE & TROI RESORT', data: [0, 0, 0, 165, 575, 0, 100, 0, 0, 280, 70, 70] },
+            { name: 'TAMPISAW KILA KUYA RUBEN', data: [0, 0, 0, 840, 760, 460, 400, 240, 220, 240, 260, 260] },
+            { name: 'W & D DREAMLAND', data: [0, 0, 0, 645, 762, 0, 371, 194, 209, 215, 333, 455] },
+            { name: 'THE MANGO TREE', data: [0, 0, 0, 70, 0, 40, 50, 25, 40, 30, 40, 75] },
+            { name: 'PALM GARDEN RESORT', data: [0, 0, 0, 3084, 2155, 0, 0, 1345, 935, 985, 1358, 1485] },
+            { name: 'MALOLOS RESORT CLUB ROYALE', data: [298, 165, 277, 450, 0, 450, 0, 0, 0, 0, 0, 0] },
+            { name: 'FLORES PRIVATE RESORT', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+        ];
+
+        // Data for 2024 (Static)
+        const data2024 = [
+            { name: 'MUSEO NG REPUBLIKA NG 1899', data: [10725, 9651, 12654, 10302, 3211, 3691, 2825, 3026, 6608, 10149, 14032, 7243] },
+            { name: 'MUSEO NG KASAYSAYANG', data: [2186, 3367, 3576, 1242, 1198, 792, 729, 1100, 1742, 3374, 4732, 2999] },
+            { name: 'PAMPULITTIKA NG PILIPINAS', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            { name: 'MALOLOS HISTORIC TOWN CENTER', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 
+            { name: 'VILLA JUANITA RESORT', data: [880, 830, 850, 1500, 1300, 1500, 700, 700, 400, 600, 900, 1500] },
+            { name: 'DJ PARADISE RESORT', data: [436, 425, 1536, 2330, 1750, 985, 269, 324, 290, 140, 317, 271] },
+            { name: 'DJ PARADISE HOTEL', data: [178, 11, 122, 139, 140, 204, 210, 109, 121, 204, 350, 162] },
+            { name: 'BARCIE INTL CENTER', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 
+            { name: 'JADE & TROI RESORT', data: [110, 0, 58, 60, 150, 100, 0, 0, 0, 0, 0, 0] },
+            { name: 'TAMPISAW KILA KUYA RUBEN', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 
+            { name: 'W & D DREAMLAND', data: [173, 156, 300, 406, 281, 279, 91, 128, 145, 251, 305, 395] },
+            { name: 'THE MANGO TREE', data: [20, 20, 40, 60, 30, 40, 40, 50, 60, 60, 60, 60] },
+            { name: 'PALM GARDEN RESORT', data: [1274, 1184, 0, 2350, 3900, 2133, 1416, 1135, 980, 983, 1054, 1225] },
+            { name: 'MALOLOS RESORT CLUB ROYALE', data: [0, 0, 250, 300, 220, 250, 425, 200, 210, 250, 200, 250] },
+            { name: 'FLORES PRIVATE RESORT', data: [0, 0, 464, 509, 593, 463, 434, 397, 217, 348, 289, 875] }
+        ];
+
+        // Dynamic Storage for 2025 onwards: { '2025': [{name: 'Est1', data: [...]}, ...], '2026': [...], ... }
+        const dynamicDataStore = {}; 
+        const dynamicChartInstances = {}; // Store Chart.js instances
+
+        function getEstablishmentColor(index) {
+            const colors = [
+                '#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850', 
+                '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', 
+                '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#1f77b4'
+            ];
+            return colors[index % colors.length];
+        }
+
+        // --- 2. CHART GENERATION & UPDATE FUNCTIONS ---
+
+        function createOrUpdateChart(year, rawData) {
+            const canvasId = `chart${year}`;
+            let chartContainer = document.getElementById(`container${year}`);
+            let canvas = document.getElementById(canvasId);
+
+            // 1. Check if the chart container already exists
+            if (!chartContainer) {
+                // If it doesn't exist, create the container
+                chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+                chartContainer.id = `container${year}`;
+                
+                const title = document.createElement('h2');
+                title.textContent = `Establishment Data - ${year}`;
+                chartContainer.appendChild(title);
+
+                canvas = document.createElement('canvas');
+                canvas.id = canvasId;
+                chartContainer.appendChild(canvas);
+
+                document.getElementById('dynamicChartsContainer').appendChild(chartContainer);
+            }
+
+            const datasets = rawData.map((item, index) => {
+                const colorIndex = establishmentLabels.length + index; 
+                return {
+                    label: item.name,
+                    data: item.data,
+                    backgroundColor: getEstablishmentColor(colorIndex),
+                };
+            });
+
+            const ctx = canvas.getContext('2d');
+
+            const chartOptions = {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `Monthly Visitor Count by Establishment - ${year}`,
+                        font: { size: 16 }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right', 
+                        labels: {
+                            font: { size: 10 }
+                        }
+                    },
+                    datalabels: { 
+                        formatter: (value, context) => {
+                            const dataArray = context.chart.data.datasets.map(dataset => dataset.data[context.dataIndex]);
+                            const total = dataArray.reduce((sum, data) => sum + data, 0);
+                            
+                            if (context.datasetIndex === context.chart.data.datasets.length - 1) {
+                                return total.toLocaleString(); 
+                            }
+                            return '';
+                        },
+                        color: '#333', 
+                        font: {
+                            weight: 'bold',
+                            size: 10
+                        },
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 4
+                    }
+                },
+                scales: {
+                    x: { stacked: true, title: { display: true, text: 'Buwan (Month)' } },
+                    y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Bilang ng Bisita (Count)' } }
+                }
+            };
+
+            // 2. Check if a Chart.js instance already exists for this year
+            if (dynamicChartInstances[year]) {
+                // Update existing chart
+                dynamicChartInstances[year].data.datasets = datasets;
+                dynamicChartInstances[year].update();
+            } else {
+                // Create new chart instance
+                Chart.register(ChartDataLabels);
+                dynamicChartInstances[year] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months.map(m => m.toUpperCase()), 
+                        datasets: datasets
+                    },
+                    options: chartOptions,
+                    plugins: [ChartDataLabels]
+                });
+            }
+        }
+
+        // --- 3. DYNAMIC INPUT FUNCTIONALITY ---
+
+        function addDynamicData() {
+            const name = document.getElementById('estName').value.trim();
+            const year = document.getElementById('inputYear').value;
+            
+            if (!name || !year) {
+                alert("Please enter both the Establishment Name and the Year.");
+                return;
+            }
+
+            // Get monthly values
+            const monthlyData = Array.from(document.querySelectorAll('#dataInputDynamic input[name="month_input"]')).map(input => {
+                const value = parseInt(input.value) || 0;
+                return Math.max(0, value);
+            });
+
+            // 1. Initialize data store for the year if it doesn't exist
+            if (!dynamicDataStore[year]) {
+                dynamicDataStore[year] = [];
+            }
+
+            // 2. Check if the establishment already exists for this year
+            const yearData = dynamicDataStore[year];
+            const existingIndex = yearData.findIndex(d => d.name === name);
+
+            if (existingIndex > -1) {
+                // Update existing data
+                yearData[existingIndex].data = monthlyData;
+                alert(`Data for "${name}" in ${year} has been updated!`);
+            } else {
+                // Add new data
+                yearData.push({ name: name, data: monthlyData });
+                alert(`New establishment "${name}" added to ${year} chart!`);
+            }
+
+            // 3. Create or Update the Chart for the specific year
+            createOrUpdateChart(year, yearData);
+
+            // 4. Reset form (optional)
+            document.getElementById('estName').value = '';
+            document.getElementById('inputYear').value = new Date().getFullYear() + 1; 
+            document.querySelectorAll('#dataInputDynamic input[name="month_input"]').forEach(input => input.value = 0);
+        }
+
+        // Helper function for static charts
+        function createChart(canvasId, titleText, rawData) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const datasets = rawData.map((item, index) => {
+                return {
+                    label: item.name,
+                    data: item.data,
+                    backgroundColor: getEstablishmentColor(index),
+                };
+            });
+            
+            Chart.register(ChartDataLabels);
+
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months.map(m => m.toUpperCase()), 
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: titleText, font: { size: 16 } },
+                        legend: { 
+                            display: true, 
+                            position: 'right', 
+                            labels: { font: { size: 10 } } 
+                        },
+                        datalabels: { 
+                            formatter: (value, context) => {
+                                const dataArray = context.chart.data.datasets.map(dataset => dataset.data[context.dataIndex]);
+                                const total = dataArray.reduce((sum, data) => sum + data, 0);
+                                
+                                if (context.datasetIndex === context.chart.data.datasets.length - 1) {
+                                    return total.toLocaleString(); 
+                                }
+                                return '';
+                            },
+                            color: '#333',
+                            font: {
+                                weight: 'bold',
+                                size: 10
+                            },
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 4
+                        }
+                    },
+                    scales: {
+                        x: { stacked: true, title: { display: true, text: 'Buwan (Month)' } },
+                        y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Bilang ng Bisita (Count)' } }
+                    }
+                },
+                plugins: [ChartDataLabels] 
+            });
+        }
+        
+        function cancelInput() {
+             // Reset form fields
+            document.getElementById('estName').value = '';
+            document.getElementById('inputYear').value = new Date().getFullYear() + 1; 
+            document.querySelectorAll('#dataInputDynamic input[name="month_input"]').forEach(input => input.value = 0);
+        }
+
+        // --- 4. EXECUTION ON PAGE LOAD ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Create Static 2023 Chart
+            createChart('chart2023', 'Monthly Visitor Count by Establishment - 2023', data2023);
+
+            // 2. Create Static 2024 Chart
+            createChart('chart2024', 'Monthly Visitor Count by Establishment - 2024', data2024);
+            
+            // Set initial year to next year (e.g., 2026 if current year is 2025)
+            document.getElementById('inputYear').value = new Date().getFullYear() + 1; 
+        });
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourist Arrival — Resort Data Statistics</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>Tourist Arrival — DOT Malolos Bulacan</h1>
+  </header>
+  
+<main class="container">
+
+  <div id="dashboard" class="card">
+    <h2>Dashboard</h2>
+
+    <div class="stack">
+
+      <div class="row">
+
+        <div class="card" style="padding:.75rem">
+          <h3 style="margin:.15rem 0">Add Resort / Tourist Spot</h3>
+
+          <form id="resort-form">
+            <input id="resort-name" placeholder="Resort / Place Name" required />
+            <div style="display:flex;gap:.5rem;margin-top:.5rem">
+              <button type="submit">Add Resort</button>
+              <button type="button" id="btn-clear-resorts" class="ghost">Clear Resorts</button>
+            </div>
+          </form>
+
+          <div id="resort-list" class="muted" style="margin-top:.5rem">No resorts yet</div>
+          <div id="resort-storage" class="muted" style="margin-top:.5rem; border:1px solid #e6e9ee; padding:.5rem; border-radius:8px; max-height:150px; overflow-y:auto;">
+            No resort history yet
+          </div>
+        </div>
+
+        <div class="card" style="padding:.75rem">
+          <h3 style="margin:.15rem 0">Add Tourist Arrival</h3>
+
+          <form id="arrival-form">
+            <label>Tourist Name</label>
+            <input id="t-name" required placeholder="Visitor name" />
+
+            <label>Resort / Place</label>
+            <select id="t-resort"></select>
+
+            <label>Category</label>
+            <select id="t-category" required>
+              <option value="">--Select--</option>
+              <option value="Church">Church</option>
+              <option value="Resort">Resort</option>
+              <option value="Event">Event</option>
+              <option value="Museum">Museum</option>
+              <option value="Restaurant">Restaurant</option>
+            </select>
+
+            <div class="row">
+              <div>
+                <label>Date</label>
+                <input id="t-date" type="date" required />
+              </div>
+              <div>
+                <label>Number of Male</label>
+                <input id="t-male" type="number" min="0" value="0" required />
+              </div>
+              <div>
+                <label>Number of Female</label>
+                <input id="t-female" type="number" min="0" value="0" required />
+              </div>
+              <div>
+                <label>Nationality</label>
+                <select id="t-nationality" required>
+                  <option value="">--Select--</option>
+                  <option value="Local">Local</option>
+                  <option value="Foreign">Foreign</option>
+                </select>
+              </div>
+              <div>
+                <label>Type of Visit</label>
+                <select id="t-visit" required>
+                  <option value="">--Select--</option>
+                  <option value="Day Tour">Day Tour</option>
+                  <option value="Overnight">Overnight</option>
+                </select>
+              </div>
+
+              <div id="hours-container">
+                <label>Number of Hours</label>
+                <select id="t-hours">
+                  <option value="">--Select--</option>
+                  <option value="1hr–2hrs">1hr–2hrs</option>
+                  <option value="1hr–3hrs">1hr–3hrs</option>
+                  <option value="1hr–4hrs">1hr–4hrs</option>
+                  <option value="1hr–5hrs">1hr–5hrs</option>
+                  <option value="1hr–6hrs">1hr–6hrs</option>
+                  <option value="1hr–7hrs">1hr–7hrs</option>
+                  <option value="1hr–8hrs">1hr–8hrs</option>
+                  <option value="1hr–9hrs">1hr–9hrs</option>
+                  <option value="1hr–10hrs">1hr–10hrs</option>
+                </select>
+              </div>
+
+              <div id="days-container">
+                <label>Number of Days Stayed</label>
+                <select id="t-days">
+                  <option value="">--Select--</option>
+                  <option value="1">1 day</option>
+                  <option value="2">2 days</option>
+                  <option value="3">3 days</option>
+                  <option value="4">4 days</option>
+                  <option value="5">5 days</option>
+                  <option value="6">6 days</option>
+                  <option value="7">7 days</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:.5rem;margin-top:.5rem">
+              <button type="submit">Add Arrival</button>
+              <button type="button" id="btn-export" class="ghost">Export CSV</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="card" style="padding:.75rem; margin-top:.75rem">
+        <h3 style="margin:.15rem 0">Arrival Storage (History)</h3>
+        <div id="arrival-storage" class="muted">No arrival history yet</div>
+      </div>
+
+      <div class="card" style="padding:.75rem; margin-top:.5rem">
+        <h3 style="margin:.15rem 0">Arrivals</h3>
+
+        <div id="arrivals-table-wrap">
+          <table id="arrivals-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Resort / Place</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Male</th>
+                <th>Female</th>
+                <th>Total</th>
+                <th>Nationality</th>
+                <th>Visit</th>
+                <th>Hours</th>
+                <th>Days</th>
+                <th>Added By</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:.5rem;display:flex;gap:.5rem">
+          <button id="btn-seed" class="ghost">Seed demo data</button>
+          <button type="button" id="btn-show-chart" class="ghost">Show Chart 📈</button>
+          <button id="btn-clear-arrivals" class="ghost">Clear arrivals</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
